@@ -1,6 +1,7 @@
 from math import log
 import numpy as np
 
+
 def get_rule_slice(n: int, in_system: int, rule: np.ndarray = np.empty(())):
     '''
     Attempts to divide rule evenly, proportional to in_system
@@ -15,10 +16,14 @@ def get_rule_slice(n: int, in_system: int, rule: np.ndarray = np.empty(())):
 
 
 def apply_rule_divconq(
-        in_neighbors: int, in_system: int, rule: np.ndarray) -> np.ndarray:
+        in_neighbors: int,
+        in_system: int,
+        num_outputs: int,
+        rule: np.ndarray) -> np.ndarray:
     '''
     Uses divide and conquer to search the rule for the output
-    Highly suboptimal for rule sizes that can be stored in memory
+    Suboptimal for rule sizes that can be stored in memory
+    Implemented because it seems easier to reason with than large decimals
     Parameters:
         in_neighbors - neighbor elements to be processed
         in_system - possible neighbor values
@@ -28,10 +33,10 @@ def apply_rule_divconq(
         Result after applying rule to the neighbors
     '''
     #TODO: Implement hybrid approach
-    #TODO: More than one output element
     part_rule = np.array(rule[::-1])
     part_neighbors = np.array(in_neighbors)
-    while len(part_neighbors) >= 1:
+    # while len(part_neighbors) >= 1:
+    while len(part_rule) > num_outputs:
         current_element = part_neighbors[0]
         remaining_neighbors = part_neighbors[1:]
         partial_rule = get_rule_slice(current_element, in_system, part_rule)

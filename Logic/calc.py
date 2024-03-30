@@ -23,7 +23,7 @@ def power_of_x(n: int, x: int) -> tuple:
 
 
 def calc_neighbor_count(
-        rule_len: int, in_system: int, num_outputs: int = 1) -> int:
+        rule_len: int, in_system: int = 2, num_outputs: int = 1) -> int:
     '''
     Calculates anticipated neighbor count (center element included)
     Parameters
@@ -32,11 +32,19 @@ def calc_neighbor_count(
             Example if only rule values are 0 or 1, then in_system=2
         num_outputs - number of output elements, default 1
     '''
+    if in_system < 2:
+        return 0
     if num_outputs < 0:
         raise ValueError("num_outputs not gte 0")
     if num_outputs in (0, rule_len):
         return 0
-    nc, rem = divmod(log(rule_len, in_system), num_outputs)
-    if rem:
-        raise ValueError("Invalid parameter combination")
+    ##Irrational output depths unsupported in this func
+    ##Consider handling irrational output (not pow of in_sys) as a postprocessing automata
+    output_depth_offset = log(num_outputs, in_system)
+    if output_depth_offset % 1:
+        raise ValueError(f"Invalid num_outputs {num_outputs}, expected pow of {in_system}")
+    base_nc = log(rule_len, in_system)
+    if base_nc % 1:
+        raise ValueError(f"Invalid rule_len {rule_len}, in_system {in_system}, expected rule_len to be pow of in_system")
+    nc = log(rule_len, in_system) - output_depth_offset
     return int(nc)

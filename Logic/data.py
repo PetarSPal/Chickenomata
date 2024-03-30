@@ -33,7 +33,8 @@ def random_fill(value: int, data: np.ndarray) -> None:
     '''
     Fills the ndarray with random ints in the range from 0 to the value
     '''
-    data = np.random.randint(value, size=data.shape)
+    #TODO: Maybe better to return and deref?
+    data[:] = np.random.randint(value, size=data.shape, dtype=int)
 
 
 def moore_one_d_ncount(totalncount: int, dimensions: int) -> int:
@@ -128,29 +129,39 @@ def get_moore_neighbors(
     '''
     #Is this needed as is?
     idxarr = get_moore_idx(coord, neighbor_count, dimensions, left)
-    return data[*idxarr.T]
+    out = data[*idxarr.T]
+    return out
 
 # def mutate_moore_neighbors(self, coord, values, neighbor_count, left=True):
 # why mutate the actual neighbors??
 #     idxarr = self._get_moore_idx(coord, neighbor_count, left)
 #     self.data[*idxarr.T] = values
+
+
+def mutate_moore(raptor, coord, data, dimensions, neighbor_count, left=True):
+    values = get_moore_neighbors(coord, data, neighbor_count, dimensions, left)
+    data[coord] = raptor.io(values)
     
-# def mutate_all(self, raptor, left=True):
-#     baseidx = self._calc_base_moore_idx(raptor.neighbor_count, left)
-#     begin, end = self._calc_begin_end(raptor.neighbor_count, left)
+def mutate_all_moore(raptor, data, dimensions, neighbor_count, left):
+    for index, _ in np.ndenumerate(data):
+        mutate_moore(raptor, index, data, dimensions, neighbor_count, left)
+    
+# def mutate_all(raptor, data, dimensions, left=True):
+#     baseidx = calc_base_moore_idx(raptor.neighbor_count, dimensions, left)
+#     begin, end = moore_one_d_range_limits(raptor.neighbor_count, left)
 #     print("be",begin,end)
 #     for i in range(-begin):
 #         idxarr = baseidx + i
 #         print("b")
 #         print(i)
 #         print(*idxarr.T)
-#         self.data[i] = raptor.io(self.data[*idxarr.T])
-#     for i in range(-begin, len(self.data)-end+1):
+#         data[i] = raptor.io(data[*idxarr.T])
+#     for i in range(-begin, len(data)-end+1):
 #         idxarr = baseidx + i
 #         print(i)
 #         print(*idxarr.T)
-#         self.data[i] = raptor.io(self.data[*idxarr.T])
-#     for i in range(len(self.data)-end+1, len(self.data)):
+#         data[i] = raptor.io(data[*idxarr.T])
+#     for i in range(len(data)-end+1, len(data)):
 #         idxarr = baseidx + i
 #         for index, x in np.ndenumerate(idxarr)
             
@@ -164,9 +175,133 @@ def get_moore_neighbors(
 
 
 
+def get_neuman_idx(
+        dimensions: int = 1, manhattan_range: int = 1) -> np.ndarray:
+    '''
+    Usage:
+        Generates a Von Neumann neighborhood, by given dimensions (>1) and range
+    Parameters:
+        dimensions
+        manhattan_range
+    Returns:
+        array containing indexes of a Von Neuman neighborhood with center abs 0
+    '''
+    
+    if dimensions < 1:
+        raise ValueError("dimension must be gte 1")
+    center = [0 for _ in range(dimensions)]
+    finalcoords = [center,]
+    ndimension_coords = {}
+
+    def split_direction(
+        basecoord: list,
+        index: int,
+        dimension: int,
+        finalcoords: list,
+        n_dimension_coords: dict
+    ) -> tuple:
+        '''
+        Usage:
+            Given a starting coordinate, index and dimension
+            Produces two new coordinates which instead contain -1 and 1 at the given index
+            Adds the two new coordinates to the finalcoord list
+            Adds the two new coordinates n_dimension_coords dict with dimension as key
+        Params:
+            basecoord -> starting coordinate
+            index -> current index (movement dimension)
+            dimension -> current dimension (parent dimension)
+            finalcoords -> list of all coords
+            n_dimension_coords -> dict of coords of N dimension
+        Returns:
+            Tuple with updated finalcoords, n_dimension_coords
+        '''
+        temp_dcoords = n_dimension_coords.copy()
+        temp_finalcoords = finalcoords.copy()
+        if dimension not in temp_dcoords:
+            temp_dcoords[dimension] = []
+        for increment in [-1, 1]:
+            new_coord = basecoord.copy()
+            new_coord[index] = increment
+            temp_finalcoords.append(new_coord)
+            temp_dcoords[dimension].append(new_coord)
+        return temp_finalcoords, temp_dcoords
+    ##R = 1
+    for index in range(len(center)):    
+        finalcoords, ndimension_coords = split_direction(
+            center, index, index+1, finalcoords, ndimension_coords)
+    ##R > 1
+    for _R in range(2, manhattan_range+1):
+        new_ndimension_coords = {}
+        # for dimension in range(1, dimensions+1):
+        #     for coords in ndimension_coords[dimension]:
+        #         for index, axis_coord in enumerate(coords[:dimension]):
+        nested_loop = [(index, axis_coord, coords, dimension)
+                       for dimension in range(1, dimensions + 1)
+                       for coords in ndimension_coords[dimension]
+                       for index, axis_coord in enumerate(coords[:dimension])]
+        for index, axis_coord, coords, dimension in nested_loop:
+            if axis_coord == 0:
+                finalcoords, new_ndimension_coords = split_direction(
+                    coords,
+                    index,
+                    dimension,
+                    finalcoords,
+                    new_ndimension_coords)
+            else:
+                if dimension not in new_ndimension_coords:
+                    new_ndimension_coords[dimension] = []
+                straight_direction = coords.copy()
+                direction = -1 if axis_coord < 0 else 1
+                straight_direction[index] = axis_coord + direction
+                new_ndimension_coords[dimension].append(straight_direction)
+                finalcoords.append(straight_direction)
+                break
+        ndimension_coords = new_ndimension_coords
+    ##TODO: left
+    return np.array(sorted(finalcoords))
+        
+    
+def get_neuman_neighbors(
+        coord: np.ndarray,
+        data: np.ndarray,
+        neighbor_count: int,
+        dimensions: int,
+        left: bool = True):
+    '''
+    Parameters:
+        coord - coordinate of center element
+        data - data source
+        neighbor_count - total neighbor count
+        dimensions - self explanatory
+        left - should automata lean left or right in even sized neighboohoods
+    Returns:
+        np.ndarray with the daya of the moore neighbors
+    '''
+    #Is this needed as is?
+    idxarr = get_neuman_idx(dimensions, neighbor_count) + coord
+    out = data[*idxarr.T]
+    return out
+
+
+
+
+
+
+
+
 # g = np.zeros(tuple(4 for _ in range(2)))
 # print(g)
 
 # print(set_center(2, g))
 
-print(calc_begin_end(81,3))
+# print(calc_begin_end(81,3))
+
+
+
+
+
+
+
+# 0 -> 1, -1 -> 2, -2
+
+# 0,0 -> (+1,-1) -> 1,0 0,1 -1,0 0,-1 ->
