@@ -55,7 +55,7 @@ def moore_one_d_ncount(totalncount: int, dimensions: int) -> int:
 
 
 def moore_one_d_range_limits(
-        total_ncount: int, dimensions: int, tend_left: bool = True) -> tuple:
+        chebyshev_range: int, tend_left: bool = True) -> tuple:
     '''
     Takes total neighbor count, dimensions as parameters.
     Optionally takes direction to tend when not perfectly symmetrical
@@ -67,16 +67,15 @@ def moore_one_d_range_limits(
     Returns begin and end (+1) coordinates of the line
     (end is +1 to account for usage in py range)
     '''
-    one_d_ncount = moore_one_d_ncount(total_ncount, dimensions)
-    half_distance, even = divmod((one_d_ncount-1), 2)
+    half_distance, even = divmod((chebyshev_range-1), 2)
     #Handling even sized neighborhoods (asymmetric)
     tendl, tendr = int(even and tend_left), int(even and (not tend_left))
     begin, end = (-half_distance-tendl, half_distance+tendr+1)
     return (begin, end)
 
 
-def calc_base_moore_idx(
-        neighbor_count: int, dimensions: int, left: bool = True) -> np.ndarray:
+def get_moore_idx(
+        chebyshev_range: int, dimensions: int, left: bool = True) -> np.ndarray:
     '''
     Parameters:
         neighbor_count - total neighbor count
@@ -86,35 +85,16 @@ def calc_base_moore_idx(
         np.ndarray containing the indexes for a general moore neighboorhood
         Center has 0 coordinates
     '''
-    b, e = moore_one_d_range_limits(neighbor_count, dimensions, left)
+    b, e = moore_one_d_range_limits(chebyshev_range, left)
     neighbor_range = range(b, e)
     neighbor_idxs = list(product(neighbor_range, repeat=dimensions))
     arr = np.array(neighbor_idxs)
     return arr
 
-
-def get_moore_idx(
-        coord: np.ndarray,
-        neighbor_count: int,
-        dimensions: int,
-        left: bool = True):
-    '''
-    Parameters:
-        coord - coordinate of center element
-        neighbor_count - total neighbor count
-        dimensions - self explanatory
-        left - should automata lean left or right in even sized neighboohoods
-    Returns:
-        np.ndarray of a moore neighborhood with the provider coord as center
-    '''
-    arr = calc_base_moore_idx(neighbor_count, dimensions, left)
-    return arr + coord
-
-
 def get_moore_neighbors(
         coord: np.ndarray,
         data: np.ndarray,
-        neighbor_count: int,
+        chebyshev_range: int,
         dimensions: int,
         left: bool = True):
     '''
@@ -128,9 +108,23 @@ def get_moore_neighbors(
         np.ndarray with the daya of the moore neighbors
     '''
     #Is this needed as is?
-    idxarr = get_moore_idx(coord, neighbor_count, dimensions, left)
-    out = data[*idxarr.T]
-    return out
+    b, e = moore_one_d_range_limits(chebyshev_range, left)
+    idxarr = get_moore_idx(chebyshev_range, dimensions, left)
+    padding = max(abs(b), e)
+    padded = np.pad(data, padding, "wrap")
+    ##TODO: Careful here regarding rule ::-1
+    ##This is a bit of a mess partly due to left
+    #Parly because the coord starts at negative values
+    #I need the left-most coord begin at 0 in order to properly work with padding
+    #The alternive is to create wrap padding on the left then MOVE it to the right
+    #Otherwise both left and right out of boundary take info from the same columns
+    remove = 0 if left else -1
+    offset = padding - (1 if left else 0)
+    for dim in range(padded.ndim):
+        padded = np.delete(padded, remove, dim)
+    # print([(idxarr + coord).T])
+    # print("pad", padded)
+    return padded[*(idxarr + coord + offset).T]
 
 # def mutate_moore_neighbors(self, coord, values, neighbor_count, left=True):
 # why mutate the actual neighbors??
@@ -140,11 +134,15 @@ def get_moore_neighbors(
 
 def mutate_moore(raptor, coord, data, dimensions, neighbor_count, left=True):
     values = get_moore_neighbors(coord, data, neighbor_count, dimensions, left)
-    data[coord] = raptor.io(values)
+    # print("coord", coord, values)
+    return raptor.io(values)
     
 def mutate_all_moore(raptor, data, dimensions, neighbor_count, left):
+    new_data = np.zeros(data.shape, dtype=int)
     for index, _ in np.ndenumerate(data):
-        mutate_moore(raptor, index, data, dimensions, neighbor_count, left)
+        m = mutate_moore(raptor, index, data, dimensions, neighbor_count, left)
+        new_data[index] = m
+    return new_data
     
 # def mutate_all(raptor, data, dimensions, left=True):
 #     baseidx = calc_base_moore_idx(raptor.neighbor_count, dimensions, left)
@@ -278,9 +276,8 @@ def get_neuman_neighbors(
         np.ndarray with the daya of the moore neighbors
     '''
     #Is this needed as is?
-    idxarr = get_neuman_idx(dimensions, neighbor_count) + coord
-    out = data[*idxarr.T]
-    return out
+    idxarr = get_neuman_idx(dimensions, neighbor_count) 
+    return data[*(idxarr + coord).T]
 
 
 
