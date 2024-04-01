@@ -29,12 +29,12 @@ def uniform_fill(value: int, data: np.ndarray) -> None:
     data.fill(value)
 
 
-def random_fill(value: int, data: np.ndarray) -> None:
+def random_fill(value: int, data: np.ndarray, side_effect=True) -> None:
     '''
     Fills the ndarray with random ints in the range from 0 to the value
     '''
     #TODO: Maybe better to return and deref?
-    data[:] = np.random.randint(value, size=data.shape, dtype=int)
+    data[:] = np.random.randint(value, size=data.shape, dtype=data.dtype)
 
 
 def moore_one_d_ncount(totalncount: int, dimensions: int) -> int:
@@ -50,7 +50,7 @@ def moore_one_d_ncount(totalncount: int, dimensions: int) -> int:
         one_d_ncount, rem = divmod(totalncount, base)
         if not rem:
             return one_d_ncount
-        raise Exception(f"invalid neighbor count for {base+1} dimensions")
+        raise Exception(f"invalid neighbor count {totalncount} for {dimensions} dimensions")
     return totalncount
 
 
@@ -132,15 +132,17 @@ def get_moore_neighbors(
 #     self.data[*idxarr.T] = values
 
 
-def mutate_moore(raptor, coord, data, dimensions, neighbor_count, left=True):
-    values = get_moore_neighbors(coord, data, neighbor_count, dimensions, left)
+def mutate_moore(raptor, coord, data, left=True):
+    c_range = moore_one_d_ncount(raptor.neighbor_count, data.ndim)
+    # print(raptor.neighbor_count, c_range)
+    values = get_moore_neighbors(coord, data, c_range, data.ndim, left)
     # print("coord", coord, values)
     return raptor.io(values)
     
-def mutate_all_moore(raptor, data, dimensions, neighbor_count, left):
+def mutate_all_moore(raptor, data, left):
     new_data = np.zeros(data.shape, dtype=int)
     for index, _ in np.ndenumerate(data):
-        m = mutate_moore(raptor, index, data, dimensions, neighbor_count, left)
+        m = mutate_moore(raptor, index, data, left)
         new_data[index] = m
     return new_data
     
