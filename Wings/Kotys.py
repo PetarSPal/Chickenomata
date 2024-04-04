@@ -1,21 +1,24 @@
+chars = {}
+chars[5] = ["█", "▓", "▒", "░", " "]
+chars[4] = chars[5][:2] + chars[5][3:]
+chars[3] = [chars[5][0], chars[5][2], chars[5][-1]]
+chars[2] = [chars[5][0], chars[5][-1]]
 
-def print_chars(row, in_system, oned):
-    chars = {}
-    chars[5] = ["█", "▓", "▒", "░", " "]
-    chars[4] = chars[5][:2] + chars[5][3:]
-    chars[3] = [chars[5][0], chars[5][2], chars[5][-1]]
-    chars[2] = [chars[5][0], chars[5][-1]]
+def print_oned_chars(row, in_system):
     act_chars = chars[in_system]
-    if oned:
-        print("".join([act_chars[c]*2 for c in row])) 
-    else:
-        #2d, fix nd later
-        for c in row:
-            print("".join([act_chars[z]*2 for z in c])) 
+    print("".join([act_chars[c]*4 for c in row])) 
+            
+def print_twod_chars(row, in_system):
+    #2d, fix nd later
+    act_chars = chars[in_system]
+    for c in row:
+        print("".join([act_chars[z]*4 for z in c])) 
 
 def Bendis(raptor, grass, settings, oned=True):
+    print_chars = print_oned_chars if oned else print_twod_chars
     for _ in range(settings.rows):
-        print_chars(grass.data, raptor.in_system, oned)
+        # print(_)
+        print_chars(grass.data, raptor.in_system)
         grass.mutate_all_moore(raptor)
         
 # def rand_factory(ca, settings,step=1):

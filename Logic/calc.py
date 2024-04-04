@@ -47,4 +47,5 @@ def calc_neighbor_count(
     if base_nc % 1:
         raise ValueError(f"Invalid rule_len {rule_len}, in_system {in_system}, expected rule_len to be pow of in_system")
     nc = log(rule_len, in_system) - output_depth_offset
+    # print('nc', nc)
     return int(nc)

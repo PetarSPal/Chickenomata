@@ -1,7 +1,7 @@
 from math import log
 import numpy as np
 from Logic.calc import power_of_x, calc_neighbor_count
-from Logic. rule import apply_rule_divconq
+from Logic. rule import apply_rule_divconq, apply_rule_std
 
 
 class Raptor:
@@ -102,7 +102,8 @@ class Raptor:
                 raise Exception("Rule length not power of in_system")
     
     def _interpreter(self, in_neighborhoods):
-        return apply_rule_divconq(in_neighborhoods, self.in_system, self.num_outputs, self.rule)
+        # return apply_rule_divconq(in_neighborhoods, self.in_system, self.num_outputs, self.rule)
+        return apply_rule_std(in_neighborhoods, self.in_system, self.num_outputs, self.rule)
     
     def io(self, input_neighbors=None):
         """Process input_neighbors based on the rule and return the output

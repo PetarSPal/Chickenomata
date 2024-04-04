@@ -85,9 +85,17 @@ def get_moore_idx(
         np.ndarray containing the indexes for a general moore neighboorhood
         Center has 0 coordinates
     '''
+    # print(chebyshev_range)
     b, e = moore_one_d_range_limits(chebyshev_range, left)
+    
+    # ##Cursed, neeed to rewrite to support irregular shapes
+    # ##The following is a temp workaround to test
+    # neighbor_range2 = range(-1, 2)
+    
     neighbor_range = range(b, e)
+    #Cursed neighbor_idxs = list(product(neighbor_range, neighbor_range2, repeat=dimensions-1))
     neighbor_idxs = list(product(neighbor_range, repeat=dimensions))
+    product()
     arr = np.array(neighbor_idxs)
     return arr
 
@@ -109,7 +117,9 @@ def get_moore_neighbors(
     '''
     #Is this needed as is?
     b, e = moore_one_d_range_limits(chebyshev_range, left)
+    # print(b,e)
     idxarr = get_moore_idx(chebyshev_range, dimensions, left)
+    # print(idxarr)
     padding = max(abs(b), e)
     padded = np.pad(data, padding, "wrap")
     ##TODO: Careful here regarding rule ::-1
@@ -120,8 +130,15 @@ def get_moore_neighbors(
     #Otherwise both left and right out of boundary take info from the same columns
     remove = 0 if left else -1
     offset = padding - (1 if left else 0)
+    
+    
     for dim in range(padded.ndim):
         padded = np.delete(padded, remove, dim)
+    #Cursed fixes
+    # padded = np.delete(padded, remove, 0)
+        
+        
+        
     # print([(idxarr + coord).T])
     # print("pad", padded)
     return padded[*(idxarr + coord + offset).T]
@@ -134,7 +151,7 @@ def get_moore_neighbors(
 
 def mutate_moore(raptor, coord, data, left=True):
     c_range = moore_one_d_ncount(raptor.neighbor_count, data.ndim)
-    # print(raptor.neighbor_count, c_range)
+    # print("data", raptor.neighbor_count, c_range)
     values = get_moore_neighbors(coord, data, c_range, data.ndim, left)
     # print("coord", coord, values)
     return raptor.io(values)

@@ -1,0 +1,16 @@
+#1 Implement hybrid CA (different CA for different elements)
+#1.1 Implement 1:1 ratio hybrid CA (one CA for every element)
+#1.2 Implement regional hybrid CA (several CA per different regions)
+#2 Implement self-modifying CA
+#2.1 Implement neighbor CA modifying CA
+#3. Improve code structure and performance
+#3.1 Implement better general tree
+#3.2 Consider building some of the tools as a C module
+#3.3 Can I use matrixes somehow for trees?
+#3.4 Use builtins or c modules over loops
+#4 Refactor docstrings
+#4.1 Look for tool to improve docstring workflow
+#5 Write tests
+#6 Write frontend
+#7 Write backend (storing rules in postgres?)
+#8 Parallelism?

@@ -1,4 +1,22 @@
 # Chickenomata
+
+Test narrative -> Remove later
+Birds are outside right now.
+Birds are hearing you.
+Birds are watching you.
+Birds are talking about you behind your back.
+Birds won a modern war.
+Birds heard us when we said that "Owls aren't what they seem".
+Birds read the posters claiming that "Birds aren't real".
+They've had enough.
+The glass is full, the cookie crumbles, the camel's back is in halves.
+Thus beings a tale of revenge.
+"Humans say that birds are goverment drones" - birds murmur.
+"No, computers aren't real - they are only chicken" - the retort.
+Pecking of keyboards can be heard.
+
+
+
 Experimenting with cellular automata concepts
 
 

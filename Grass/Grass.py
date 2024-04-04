@@ -13,8 +13,8 @@ class Grass:
         fg_value: int = 1,
         dtype: np.dtype = np.dtype('uint32')) -> None:
         '''
-        Grass is a wrapper on top of a numpy ndarray
-        For the purpouses of storing data to be processed by automata
+        Grass is a container on top of a numpy ndarray
+        For the purpouses of storing data to be processed by automata and storing routines.
         The array can be accessed and modified directly via the instance .data
         Parameters:
             shape -> numpy shape
