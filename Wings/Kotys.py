@@ -21,6 +21,13 @@ def Bendis(raptor, grass, settings, oned=True):
         print_chars(grass.data, raptor.in_system)
         grass.mutate_all_moore(raptor)
         
+def Bendis2(raptors, grass, settings, oned=True):
+    print_chars = print_oned_chars if oned else print_twod_chars
+    for _ in range(settings.rows):
+        # print(_)
+        print_chars(grass.data, raptors[0].in_system)
+        grass.mutate_all_moore_raptors(raptors, settings.rows)
+        
 # def rand_factory(ca, settings,step=1):
 #     row = set_initial_condition(settings.cols, settings.initial_condition)
 #     f = open("randrules.txt", "a")

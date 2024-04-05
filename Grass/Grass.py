@@ -31,6 +31,7 @@ class Grass:
             case _:
                 self.data = np.full(shape, bg_value, dtype)
                 self._set_center(fg_value, False)
+        self.linecount = 0
     
 
     @property
@@ -77,6 +78,14 @@ class Grass:
             self._erase_history()
         self.data = data.mutate_all_moore(
             raptor, self.data, left)
+        
+    def mutate_all_moore_raptors(self, raptors, cols, left=True):
+        if self._history:
+            self._hist_data.append(self.data)
+            self._erase_history()
+        self.data = data.mutate_all_moore_raptors(
+            raptors, self.data, cols, self.linecount, left)
+        self.linecount +=1
     
     
     

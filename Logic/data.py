@@ -1,5 +1,5 @@
 import numpy as np
-from itertools import product
+from itertools import product, cycle, repeat
 
 
 def set_center(
@@ -161,6 +161,37 @@ def mutate_all_moore(raptor, data, left):
     for index, _ in np.ndenumerate(data):
         m = mutate_moore(raptor, index, data, left)
         new_data[index] = m
+    return new_data
+
+# def mutate_all_moore_raptors(raptors, data, left):
+#     new_data = np.zeros(data.shape, dtype=int)
+#     crap = cycle(raptors)
+#     import random
+#     for index, _ in np.ndenumerate(data):
+#         # print(crap.rule)
+#         m = mutate_moore(next(crap), index, data, left)
+#         new_data[index] = m
+#     rand = iter([[random.randint(0,1) for _ in range(8)] for _ in range(len(raptors))])
+#     for rap in raptors:
+#         rap.rule = next(rand)
+#     return new_data
+
+def mutate_all_moore_raptors(raptors, data, cols, lines, left):
+    new_data = np.zeros(data.shape, dtype=int)
+    crap = cycle(raptors)
+    step = cycle(range(10))
+    import random
+    for index, _ in np.ndenumerate(data):
+        if next(step)== 0:
+            cur = next(crap)
+        # print(crap.rule)
+        m = mutate_moore(cur, index, data, left)
+        new_data[index] = m
+    if lines % 1 == 0 :
+        rand = iter([[random.randint(0,4) for _ in range(125)] for _ in range(len(raptors))])
+        # rand = iter([[random.randint(0,1) for _ in range(8)] for _ in range(len(raptors))])
+        for rap in raptors:
+            rap.rule = next(rand)
     return new_data
     
 # def mutate_all(raptor, data, dimensions, left=True):
