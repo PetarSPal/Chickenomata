@@ -1,9 +1,9 @@
 from itertools import product
 
-# self = 1, rest of neighbors <2 -> 0
-# self = 1, rest 2-3 -> 1
-# self = 1, rest >3 -> 0
-# self = 0, rest = 3 -> 1
+# center = 1, rest of neighbors <2 -> 0
+# center = 1, rest 2-3 -> 1
+# center = 1, rest >3 -> 0
+# center = 0, rest = 3 -> 1
 
 x = list(product(range(2), repeat=9))
 y = product("01", repeat=9)

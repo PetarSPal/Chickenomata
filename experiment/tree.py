@@ -1,5 +1,9 @@
 # from collections import UserList
 
+#Root must have all possible digits in the num system
+#For num system 100 that would be 0 - 100
+
+
 class Oumbellatum():
     def __init__(self, nodes, n=2):
         #TODO: add autofill logic (binary,collection -> tree)
@@ -130,3 +134,11 @@ class Oumbellatum():
 # test(m[0])
 # test(m[1])
 # test(m[2])
+
+
+te = Oumbellatum([*range(1000)],1000)
+fe = [te for _ in range(1000)]
+ce = Oumbellatum(fe,1000)
+print(ce[99][99])
+
+te = te + 1
