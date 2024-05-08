@@ -3,6 +3,8 @@
 /pyproj/
 /bin/
 run
+lib64
+/__experiment/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
