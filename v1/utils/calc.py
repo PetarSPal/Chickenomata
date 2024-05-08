@@ -1,22 +1,21 @@
-def reduce_mnc(totalncount: int, dimensions: int, test=False) -> int:
-    '''
+def reduce_mnc(totalncount: int, dimensions: int) -> int:
+    """
     Projects a (Moore) total neighbor count (center included) onto 1D
     (e.g. 3D: 27 -> 2D: 9 -> 1D: 3 -> return 3)
-    '''
-    base = 3**(dimensions-1)
+    """
+    base = 3 ** (dimensions - 1)
     if not (1 == base):
         reduced_ncount, rem = divmod(totalncount, base)
         if not rem:
             return reduced_ncount
-        if test:
-            return reduced_ncount or 2
-        raise Exception(f"invalid neighbor count {totalncount} for {dimensions} dimensions")
+        raise Exception(
+            f"invalid neighbor count {totalncount} for {dimensions} dimensions"
+        )
     return totalncount
 
 
-def split_mnc(
-        total_nc: int, tend_left: bool = True) -> tuple:
-    '''
+def split_mnc(total_nc: int, tend_left: bool = True) -> tuple:
+    """
     Reduces total (Moore) neighbor count (center included) to two chebyshev ranges
         One for each direction of a 1D axis
     If tend_left is true and total_nc is even ->
@@ -24,20 +23,20 @@ def split_mnc(
         If tend_left is false second value will be +1
         Otherwise they are the same due to symmetry
     Returns a tuple
-    '''
-    half_distance, even = divmod((total_nc-1), 2)
+    """
+    half_distance, even = divmod((total_nc - 1), 2)
     tendl, tendr = int(even and tend_left), int(even and (not tend_left))
-    begin, end = (half_distance+tendl, half_distance+tendr)
-    return (begin, end)
+    begin, end = (half_distance + tendl, half_distance + tendr)
+    return tuple([begin, end])
 
 
 def _log(n: int, x: int) -> tuple:
-    '''
+    """
     Checks if n is a power of x
     Returns tuple
         First value contains bool for truth
         Second value contains the power (defaults to 0 if not a pow)
-    '''
+    """
     n, x = int(n), int(x)
     power = 0
     if n == 0:
@@ -50,4 +49,3 @@ def _log(n: int, x: int) -> tuple:
         n = n // x
         power += 1
     return (True, power)
-

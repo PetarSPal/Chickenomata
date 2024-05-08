@@ -1,5 +1,5 @@
 """
-Configs for handling reasonable defaults
+Configuration model
 """
 
 
@@ -15,7 +15,8 @@ class Cfg:
         # Grass:
         self._cols = 250
         self._ndim = 1
-        self.in_sys = 2
+        self.in_system = 2
+        self.num_outputs = 1
         # Currently o
         self._shape = (675, )
         self.asym = 'left'

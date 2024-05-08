@@ -1,13 +1,15 @@
 # from collections import UserList
 
-#Root must have all possible digits in the num system
-#For num system 100 that would be 0 - 100
+# Root must have all possible digits in the num system
+# For num system 100 that would be 0 - 100
 
+# An incomplete n-ary tree looks like the way to go
+# If leaves are identical -> store them as one element at current depth + store expected depth to act like complete tree
 
 class Oumbellatum():
     def __init__(self, nodes, n=2):
-        #TODO: add autofill logic (binary,collection -> tree)
-        #TODO: add testing framework
+        # TODO: add autofill logic (binary,collection -> tree)
+        # TODO: add testing framework
         self._n = n
         self.nodes = nodes
         self.next = None
@@ -18,12 +20,13 @@ class Oumbellatum():
         if len(self) != n:
             raise ValueError(f"Invalid length {len(self)} for n={n}")
         if not (master or leaf):
-            raise ValueError(f"Invalid data types {types}, uniform int or Oumbellatum expected")
+            raise ValueError(
+                f"Invalid data types {types}, uniform int or Oumbellatum expected")
         if master and not (ns := set(node._n for node in nodes)) <= {n}:
             raise ValueError(f"Invalid child n values: {ns} for n={n}")
         if master:
             self._depth = nodes[0]._depth + 1
-        #Consider separating nodes to separate stem/leaf/bulb types
+        # Consider separating nodes to separate stem/leaf/bulb types
         branchnodes = nodes
         if self._depth == 2:
             branchnodes[0].next = branchnodes[1]
@@ -41,33 +44,33 @@ class Oumbellatum():
             branchnodes = depthnodes
             while not branchnodes[0]._depth == 1:
                 for idx in range(n):
-                    branchnodes[idx] = branchnodes[idx][(idx%2)-1]
+                    branchnodes[idx] = branchnodes[idx][(idx % 2)-1]
             for node1, node2 in self._pairwise(branchnodes):
                 node1.next = node2
                 node2.prev = node1
         if self._depth == 1:
-            ##TODO: Important: Add bulb assignment logic (static memory for all possible leaf values)
-            ##TODO: Important: Add +1 -1 coalescing logic
+            # TODO: Important: Add bulb assignment logic (static memory for all possible leaf values)
+            # TODO: Important: Add +1 -1 coalescing logic
             pass
 
     def _pairwise(self, iterable):
         "s -> (s0, s1), (s2, s3), (s4, s5), ..."
         a = iter(iterable)
         return zip(a, a)
-        
+
     def __len__(self):
         return len(self.nodes)
-    
+
     # def __setattr__(self, name, value):
     #     if len(value) != 3:
     #         raise ValueError(f"Invalid data length {len(self.data)} for n={self._n}")
     #     self.nodes = value
-    
+
     def __getitem__(self, key):
         # if key >= self._n:
         #     raise ValueError(f"Invalid key {key} for n={self._n}")
         return self.nodes[key]
-    
+
     def __setitem__(self, key, value):
         # if key >= self._n:
         #     raise ValueError(f"Invalid key {key} for n={self._n}")
@@ -129,16 +132,16 @@ class Oumbellatum():
 #     subtest(print, tree[0], pos)
 #     subtest(print, tree[1], pos)
 #     subtest(print, tree[2], pos)
-    
-    
+
+
 # test(m[0])
 # test(m[1])
 # test(m[2])
 
 
-te = Oumbellatum([*range(1000)],1000)
+te = Oumbellatum([*range(1000)], 1000)
 fe = [te for _ in range(1000)]
-ce = Oumbellatum(fe,1000)
+ce = Oumbellatum(fe, 1000)
 print(ce[99][99])
 
 te = te + 1

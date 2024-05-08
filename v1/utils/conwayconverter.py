@@ -5,6 +5,13 @@ from itertools import product
 # center = 1, rest >3 -> 0
 # center = 0, rest = 3 -> 1
 
+#
+# if neighbors == 3 or (center == 1 and neighbors == 2):
+#     center = 1
+# else:
+#     center = 0
+#
+
 x = list(product(range(2), repeat=9))
 y = product("01", repeat=9)
 
@@ -13,7 +20,7 @@ for i, v in enumerate(y):
     center = x[i][3]
     rest = sum(x[i][:3]) + sum(x[i][4:])
     print("".join(v), end=" -> ")
-    if center == 1 and (rest<2 or rest>3):
+    if center == 1 and (rest < 2 or rest > 3):
         out = 0
     elif center == 1:
         out = 1

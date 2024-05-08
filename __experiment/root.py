@@ -1,6 +1,8 @@
 from typing import Self
 import dis
 
+# Need to flesh this out better, conceptually
+
 
 class Node:
     def __init__(
@@ -12,6 +14,7 @@ class Node:
         self.value: int = value
         self.next: Self | None = next
         self.prev: Self | None = prev
+
 
 class FakeData:
     def __init__(self, num_sys: int) -> None:
@@ -26,14 +29,15 @@ class FakeData:
         self.data[-1].prev = self.data[-2]
         self.data[0].prev = self.data[-1]
         self.data[-1].next = self.data[0]
-        
+
+
 class FakeInt:
     def __init__(self, value, source):
         true_value = abs(value % source.num_sys)
         self.data = source.data[true_value]
-            
+
     def __add__(self, other):
-        ##TODO: add check for going over/under
+        # TODO: add check for going over/under
         if other > 0:
             for _ in range(other):
                 self.data = self.data.next
@@ -41,11 +45,11 @@ class FakeInt:
             for _ in range(abs(other)):
                 self.data = self.data.prev
         return self
-    
+
     def __sub__(self, other):
         self.__add__(-other)
         return self
-    
+
     def __mul__(self, other):
         self.__add__(self.data.value * (other-1))
         return self
@@ -53,33 +57,35 @@ class FakeInt:
     def __truediv__(self, other):
         self.__sub__(self.data.value - (self.data.value // other))
         return self
-    
+
     def __str__(self):
         return "%d" % int(self.data.value)
-    
+
     def __repr__(self):
         return "%d" % int(self.data.value)
-    
+
+
 class Root:
-    ##Testing with dis.dis makes this seem at lest semi-redundant (ints get cached by parser already)
-    ##TODO: Test with actual automata to confirm
+    # Testing with dis.dis makes this seem at lest semi-redundant (ints get cached by parser already)
+    # TODO: Test with actual automata to confirm
     def __init__(self, values, source):
         self.source = source
         if len(values) != source.num_sys:
-            raise Exception("count of values {values} does not match in_sys {source.num_sys}")
+            raise Exception(
+                "count of values {values} does not match in_sys {source.num_sys}")
         true_values = [abs(value % source.num_sys) for value in values]
         self.data = [FakeInt(value, source) for value in true_values]
-    
+
     def __getitem__(self, key):
         return self.data[key].data.value
-    
+
     def __testitem__(self, key):
         return self.data[key].data
-    
+
     def __setitem__(self, key, value):
         self.data[key] = FakeInt(value, self.source)
-        
-        
+
+
 # def testfunc(val):
 #     a = [val for i in range(val)]
 #     a[0] +=1
@@ -102,7 +108,7 @@ class Root:
 #     import resource
 #     print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 #     print(rtrt.data)
-    
+
 # # testfunc(999)
 # # dis.distb()
 # # dis.dis("a = testfunc(999)", depth=100, show_caches=True)
@@ -118,7 +124,6 @@ class Root:
 # # rtrt[2] += 5
 
 
-
 # dis.dis("dat = FakeData(5)")
 # dis.dis("rtrt = Root([1,0,2,2,3], dat)")
 # dis.dis("rtrt[2] += 5")
@@ -126,7 +131,6 @@ class Root:
 # dis.dis("rtrt[2] += 5")
 # dis.dis("rtrt[2] += 5")
 # dis.dis("rtrt[2] += 5")
-
 
 
 # print(rtrt[2])
@@ -137,7 +141,7 @@ class Root:
 # print(rtrt[2])
 # print(rtrt[3])
 
-    
+
 # dat = FakeData(5)
 # inte = FakeInt(3, dat)
 # inte2 = FakeInt(4, dat)
@@ -146,7 +150,6 @@ class Root:
 # print(inte)
 # print(inte2.data.prev)
 # print(inte2)
-
 
 
 # print(inte)
@@ -215,7 +218,7 @@ class Root:
 #                 temp = make_node(temp, Node(val))
 #             temp.next = last
 #             last.prev = temp
-            
+
 #     def __add__(self, other):
 #         if other > 0:
 #             for _ in range(other):
@@ -228,11 +231,11 @@ class Root:
 #                 prev = self.cur.prev
 #                 self.cur = prev
 #         return self
-    
+
 #     def __sub__(self, other):
 #         self.__add__(-other)
 #         return self
-    
+
 #     def __mul__(self, other):
 #         assert self.cur is not None
 #         self.__add__(self.cur.value * (other-1))
@@ -242,12 +245,10 @@ class Root:
 #         assert self.cur is not None
 #         self.__sub__(self.cur.value - (self.cur.value // other))
 #         return self
-    
+
 #     def __str__(self):
 #         assert self.cur is not None
 #         return "%d" % int(self.cur.value)
-    
-        
 
 
 # a = FakeData(7, 8)
@@ -260,11 +261,10 @@ class Root:
 # print(b.cur.next)
 
 
-
 # class FakeInt:
 #     def __init__(self, value, num_sys):
 #         self._value = FakeData(value, num_sys)
-        
+
 #     def __add__(self, other):
 #         out = self._value.cur
 #         if other > 0:
@@ -274,7 +274,7 @@ class Root:
 #             for _ in range(abs(other)):
 #                 out = out.prev
 #         return out
-        
+
     # def __sub__(self, other):
     #     res = super(positive, self).__sub__(other)
     #     return self.__class__(max(res, 0))
@@ -292,9 +292,7 @@ class Root:
 
     # def __repr__(self):
     #     return "positive(%d)" % int(self)
-        
-    
-  
+
 
 # a = FakeData(1,3)
 
@@ -330,15 +328,13 @@ class Root:
 
 #     def __repr__(self):
 #         return "positive(%d)" % int(self)
-    
+
 # a = positive(5, 2)
 # b = positive(5, 3)
 
 # # b = 2 * a
 # # print(b)
 # print(a.num_sys)
-    
-    
 
 
 # 0 1
@@ -349,4 +345,3 @@ class Root:
 
 # 0 1 2 3
 # 0 1 01 11
-    
