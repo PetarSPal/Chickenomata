@@ -6,25 +6,31 @@ Cellular automata playground written in Python
 " target="_blank"><img src="http://img.youtube.com/vi/lvOOSHP0FyM/0.jpg" 
 alt="Chickenomata" width="240" height="180" border="10" /></a>
 
-Usage:
-git clone
-python main.py
-or
-python test.py
 
-It's a project I've been working on for learning purpouses
-Sharing in case someone finds my experience useful
+### Usage:
+```bash
+git clone
+```
+```bash
+python main.py 
+```
+or
+```bash
+python test.py
+```
+
+Chickenomata is a project I've been working on for learning purposes.
+Uploading in case someone finds my experience useful.
 AS IS use at your own risk
 
-Current iteration is using numpy ndarrays for underlying computation
-Implementation is far from performant, due to blocking single-thread
-Rendering uses Pygame + Moderngl
+Current iteration relies upon numpy ndarrays for underlying computation.
+Performance is therefore far from optimal, due to blocking single-thread.
+Multiple rendering options -> console, pygame raster or pygame + moderngl
 
-Current features I'd like to work on:
--Move computation to GPU
--Add colors for nonbinary automata to moderngl rendering
--Add an interface
--Further rendering and computation optimizations
--Refactor
--Tests
--Additional automata types
+###  Features I'd like to work on:
+ - Move computation to GPU
+ - Add colors for nonbinary automata to moderngl rendering
+ - Add an interface -Further rendering and computation optimizations
+ - Refactor
+ - Tests
+ - Additional automata types
